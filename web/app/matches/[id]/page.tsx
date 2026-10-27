@@ -35,6 +35,7 @@ export default async function MatchPage({ params }: { params: Promise<{ id: stri
               {c.source?.startsWith('llm:') ? <Badge tone="blue">AI coach · {c.source.slice(4)}</Badge> : <Badge tone="slate" title="Deterministic rules applied to your match numbers. Not a language model.">Rule-based coach (not AI)</Badge>}
               {c.status === 'fallback' && <Badge tone="amber">AI coach unavailable, showing rule-based report</Badge>}
             </div>
+            {c.status === 'fallback' && c.error && <p className="rounded border border-amber-500/30 bg-amber-500/10 p-2 text-xs text-amber-200">Temporary diagnostic: {c.error}</p>}
             <p className="text-lg text-white">{c.content.summary}</p>
             <div className="grid gap-4 sm:grid-cols-2">
               <div><h3 className="mb-1 text-sm font-semibold text-emerald-300">Strengths</h3><ul className="list-disc space-y-1 pl-5 text-sm text-slate-300">{c.content.strengths.map((s, i) => <li key={i}>{s}</li>)}</ul></div>

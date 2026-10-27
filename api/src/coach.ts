@@ -111,7 +111,9 @@ export async function coachWithFallback(primary: CoachProvider | null, facts: Co
     // Validate here too, so no provider can store malformed output as 'ready'.
     return { status: 'ready', source: primary.name, content: validateCoaching(await primary.generate(facts)) };
   } catch (e: any) {
-    return { status: 'fallback', source: rules.name, content: await rules.generate(facts), error: String(e?.message ?? e).slice(0, 200) };
+    const error = String(e?.message ?? e).slice(0, 200);
+    console.warn(`Coach provider ${primary.name} failed: ${error}`);
+    return { status: 'fallback', source: rules.name, content: await rules.generate(facts), error };
   }
 }
 
