@@ -15,7 +15,6 @@ const bearer = (req: Request, header = 'authorization') => {
   return header === 'authorization' ? (v.startsWith('Bearer ') ? v.slice(7).trim() : null) : v.trim();
 };
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
 export function createApp(pf: Platform, opts: AppOptions = {}) {
   const app = express();
   app.disable('x-powered-by');
@@ -69,7 +68,7 @@ export function createApp(pf: Platform, opts: AppOptions = {}) {
 
   app.get('/v1/leaderboard', async (req, res) => {
     const n = Math.min(Math.max(parseInt(String(req.query.limit ?? '50'), 10) || 50, 1), 100);
-    const r = await pf.db.query<any>(`SELECT username, rating, rated_matches, rated_wins, is_seed FROM players WHERE rated_matches > 0 ORDER BY rating DESC, rated_matches DESC, created_at ASC LIMIT $1`, [n]);
+    const r = await pf.db.query<any>(`SELECT username, rating, rated_matches, rated_wins, is_seed FROM players WHERE rated_matches > 0 AND is_seed = false ORDER BY rating DESC, rated_matches DESC, created_at ASC LIMIT $1`, [n]);
     res.json({ players: r.rows.map((p, i) => ({ rank: i + 1, username: p.username, rating: p.rating, ratedMatches: p.rated_matches, ratedWins: p.rated_wins, seed: p.is_seed })) });
   });
 

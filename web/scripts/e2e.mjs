@@ -87,7 +87,7 @@ try {
 
   // --- leaderboard
   r = await web('/leaderboard'); html = await r.text();
-  check('leaderboard ranks alice 1216 above bob 1184', html.indexOf('e2e_alice') > 0 && html.indexOf('e2e_alice') < html.indexOf('e2e_bob') && html.includes('1216') && html.includes('1184'));
+  check('leaderboard ranks alice 1216 above bob 1184', html.indexOf('e2e_alice') > 0 && html.indexOf('e2e_alice') < html.indexOf('e2e_bob') && /1,?216/.test(html) && /1,?184/.test(html));
   r = await web('/'); html = await r.text(); check('landing top-players now lists alice', html.includes('e2e_alice'));
 
   // --- secrets never reach the browser

@@ -136,6 +136,25 @@ describe('dashboard data + tenant isolation', () => {
     expect(JSON.stringify(lb)).not.toMatch(/hash|token|password/i);
   });
 
+  it('keeps simulator accounts off the public leaderboard without deleting their records', async () => {
+    const { app, db } = await setup();
+    await request(app).post('/v1/auth/register').send({ username: 'real_player', password: 'correct-horse-9' });
+    await db.query(`UPDATE players SET rated_matches = 2, rated_wins = 1 WHERE username = 'real_player'`);
+    for (let i = 1; i <= 6; i++) {
+      await db.query(
+        `INSERT INTO players (username, password_hash, ingest_token_hash, rating, rated_matches, rated_wins, is_seed)
+         VALUES ($1, 'test', $2, $3, 1, 1, true)`,
+        [`sim_${String(i).padStart(2, '0')}`, `seed-token-${i}`, 1400 - i],
+      );
+    }
+
+    const lb = (await request(app).get('/v1/leaderboard')).body.players;
+    expect(lb.map((p: any) => p.username)).toEqual(['real_player']);
+    expect(lb.every((p: any) => p.seed === false)).toBe(true);
+    expect((await db.query(`SELECT username FROM players WHERE is_seed ORDER BY username`)).rows.map((p: any) => p.username))
+      .toEqual(['sim_01', 'sim_02', 'sim_03', 'sim_04', 'sim_05', 'sim_06']);
+  });
+
   it('register/login: duplicate names, weak passwords, wrong password', async () => {
     const { app, mk } = await setup();
     await mk('alice');
