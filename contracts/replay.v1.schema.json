@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://dbz-analytics.example/schemas/replay.v1.schema.json",
+  "title": "Replay payload v1",
+  "description": "Derived from replay_io.cpp (replay_save). 'frames' is change-only: an entry at tick f means those buttons are held from tick f until the next entry. total_frames is the full tick count.",
+  "type": "object",
+  "required": ["match_id", "fps", "total_frames", "p1_character", "p2_character", "frames"],
+  "properties": {
+    "match_id": { "type": "string", "pattern": "^[A-Za-z0-9_-]{1,64}$" },
+    "fps": { "type": "integer", "const": 60 },
+    "total_frames": { "type": "integer", "minimum": 0, "maximum": 200000 },
+    "p1_character": { "type": "string", "minLength": 1, "maxLength": 32 },
+    "p2_character": { "type": "string", "minLength": 1, "maxLength": 32 },
+    "frames": {
+      "type": "array",
+      "maxItems": 200000,
+      "items": {
+        "type": "object",
+        "required": ["f", "p1", "p2"],
+        "properties": {
+          "f": { "type": "integer", "minimum": 0, "maximum": 199999 },
+          "p1": { "$ref": "#/definitions/buttons" },
+          "p2": { "$ref": "#/definitions/buttons" }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "buttons": {
+      "type": "array",
+      "maxItems": 7,
+      "uniqueItems": true,
+      "items": { "enum": ["left", "right", "up", "down", "punch", "kick", "block"] }
+    }
+  }
+}

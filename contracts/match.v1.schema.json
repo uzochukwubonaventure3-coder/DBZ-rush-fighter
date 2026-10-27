@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://dbz-analytics.example/schemas/match.v1.schema.json",
+  "title": "Match stats payload v1",
+  "description": "Derived from stats_io.cpp (stats_to_json). Fields the game does not send yet (player ids, specials, special finishing moves) are accepted but are not required.",
+  "type": "object",
+  "required": ["game_id", "match_id", "timestamp", "winner", "player1", "player2", "rounds", "p1_style", "p2_style"],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "game_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$" },
+    "match_id": { "type": "string", "pattern": "^[A-Za-z0-9_-]{1,64}$" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "winner": { "enum": ["player1", "player2", "none"] },
+    "player1": { "$ref": "#/definitions/fighter" },
+    "player2": { "$ref": "#/definitions/fighter" },
+    "rounds": { "type": "array", "minItems": 1, "maxItems": 15, "items": { "$ref": "#/definitions/round" } },
+    "p1_style": { "$ref": "#/definitions/style" },
+    "p2_style": { "$ref": "#/definitions/style" }
+  },
+  "definitions": {
+    "count": { "type": "integer", "minimum": 0, "maximum": 100000 },
+    "fighter": {
+      "type": "object",
+      "required": ["name", "character"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 32 },
+        "character": { "type": "string", "minLength": 1, "maxLength": 32 }
+      }
+    },
+    "round": {
+      "type": "object",
+      "required": ["round_number", "winner", "duration_sec", "p1_hits", "p2_hits", "p1_blocks", "p2_blocks", "finishing_move"],
+      "properties": {
+        "round_number": { "type": "integer", "minimum": 1, "maximum": 15 },
+        "winner": { "enum": ["p1", "p2", "draw"] },
+        "duration_sec": { "type": "integer", "minimum": 0, "maximum": 3600 },
+        "p1_hits": { "$ref": "#/definitions/count" },
+        "p2_hits": { "$ref": "#/definitions/count" },
+        "p1_blocks": { "$ref": "#/definitions/count" },
+        "p2_blocks": { "$ref": "#/definitions/count" },
+        "finishing_move": { "enum": ["punch", "kick", "special", "none"] }
+      }
+    },
+    "style": {
+      "type": "object",
+      "required": ["punches", "kicks", "specials", "jumps", "crouches"],
+      "properties": {
+        "punches": { "$ref": "#/definitions/count" },
+        "kicks": { "$ref": "#/definitions/count" },
+        "specials": { "$ref": "#/definitions/count" },
+        "jumps": { "$ref": "#/definitions/count" },
+        "crouches": { "$ref": "#/definitions/count" }
+      }
+    }
+  }
+}

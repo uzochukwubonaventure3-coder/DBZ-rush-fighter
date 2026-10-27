@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+:root { color-scheme: dark; }
+body { @apply bg-ink-950 text-slate-200 antialiased; background-image: radial-gradient(900px 420px at 80% -10%, rgba(255,148,25,.10), transparent 60%); background-repeat: no-repeat; }
+a:focus-visible, button:focus-visible, input:focus-visible { @apply outline outline-2 outline-offset-2 outline-ember-400; }
+@media (prefers-reduced-motion: reduce) { * { animation-duration: .01ms !important; transition-duration: .01ms !important; } }

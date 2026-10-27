@@ -1,0 +1,50 @@
+{
+    "game_id": "fighting-game-v1",
+    "match_id": "match_20261026_143012",
+    "p1_style": {
+        "crouches": 17,
+        "jumps": 10,
+        "kicks": 42,
+        "punches": 65,
+        "specials": 0
+    },
+    "p2_style": {
+        "crouches": 22,
+        "jumps": 13,
+        "kicks": 49,
+        "punches": 79,
+        "specials": 0
+    },
+    "player1": {
+        "character": "Broly",
+        "name": "Player 1"
+    },
+    "player2": {
+        "character": "Vegeta",
+        "name": "Player 2"
+    },
+    "rounds": [
+        {
+            "duration_sec": 48,
+            "finishing_move": "kick",
+            "p1_blocks": 1,
+            "p1_hits": 16,
+            "p2_blocks": 0,
+            "p2_hits": 17,
+            "round_number": 1,
+            "winner": "p1"
+        },
+        {
+            "duration_sec": 27,
+            "finishing_move": "punch",
+            "p1_blocks": 3,
+            "p1_hits": 20,
+            "p2_blocks": 0,
+            "p2_hits": 9,
+            "round_number": 2,
+            "winner": "p1"
+        }
+    ],
+    "timestamp": "2026-10-26T14:34:00Z",
+    "winner": "player1"
+}
