@@ -94,7 +94,11 @@ export class GeminiCoach implements CoachProvider {
         generationConfig: { responseMimeType: 'application/json' },
       }),
     });
-    if (!res.ok) throw new Error(`LLM provider returned HTTP ${res.status}`);
+    if (!res.ok) {
+      const errorBody: any = await res.json().catch(() => null);
+      const detail = typeof errorBody?.error?.message === 'string' ? `: ${errorBody.error.message.slice(0, 200)}` : '';
+      throw new Error(`LLM provider returned HTTP ${res.status}${detail}`);
+    }
     const body: any = await res.json();
     const text = body?.candidates?.[0]?.content?.parts?.[0]?.text;
     if (typeof text !== 'string') throw new Error('LLM provider returned no content');
