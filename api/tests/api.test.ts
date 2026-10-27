@@ -1,6 +1,6 @@
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
-import { OpenAICoach, type CoachProvider } from '../src/coach';
+import { GeminiCoach, OpenAICoach, type CoachProvider } from '../src/coach';
 import { clone, constructedReplay, realSample, setup, withId } from './helpers';
 
 const post = (app: any, tok: string, body: any, p2?: string) => {
@@ -230,6 +230,14 @@ describe('coaching failures never lose the match', () => {
     expect((await run(new OpenAICoach('k', 'm', mkFetch(async () => content('not json'))))).coaching.status).toBe('fallback');
     expect((await run(new OpenAICoach('k', 'm', mkFetch(async () => content('{"summary":"x"}'))))).coaching.status).toBe('fallback');
     const good = await run(new OpenAICoach('k', 'm', mkFetch(async () => content(JSON.stringify({ summary: 'ok', strengths: ['a'], weaknesses: ['b'], drills: ['c'] })))));
+    expect(good.coaching).toMatchObject({ status: 'ready', source: 'llm:m' });
+  });
+  it('GeminiCoach: HTTP errors and malformed output fall back; JSON output is accepted', async () => {
+    const mkFetch = (impl: () => Promise<Response>) => (async () => impl()) as unknown as typeof fetch;
+    const content = (text: string) => new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text }] } }] }), { status: 200 });
+    expect((await run(new GeminiCoach('k', 'm', mkFetch(async () => new Response('{}', { status: 429 }))))).coaching.status).toBe('fallback');
+    expect((await run(new GeminiCoach('k', 'm', mkFetch(async () => content('not json'))))).coaching.status).toBe('fallback');
+    const good = await run(new GeminiCoach('k', 'm', mkFetch(async () => content(JSON.stringify({ summary: 'ok', strengths: ['a'], weaknesses: ['b'], drills: ['c'] })))));
     expect(good.coaching).toMatchObject({ status: 'ready', source: 'llm:m' });
   });
   it('retry endpoint re-runs coaching', async () => {
