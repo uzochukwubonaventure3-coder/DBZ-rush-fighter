@@ -40,7 +40,7 @@ Two files, both already created with blank values. They start with a dot, so Win
 | `web/.env.local` | `API_URL` (where the API runs; already `http://localhost:4000`) |
 
 * **Supabase**: dashboard → your project → **Connect** (top of the page) → **Session pooler** → copy the URI into `DATABASE_URL` and replace `[YOUR-PASSWORD]` (URL-encode special characters). The Session pooler works on IPv4-only hosts; the "Direct connection" string is IPv6-only.
-* **AI coach**: set `AI_PROVIDER=gemini`, `GEMINI_API_KEY`, and `GEMINI_MODEL` (for example, `gemini-2.5-flash`). If the Gemini credentials are missing, the rule-based coach runs, labelled "Rule-based coach (not AI)". OpenAI remains available by setting `AI_PROVIDER=openai` with `OPENAI_API_KEY` and `OPENAI_MODEL`.
+* **AI coach**: set `AI_PROVIDER=gemini`, `GEMINI_API_KEY`, and `GEMINI_MODEL` (for example, `gemini-3.8-flash`). If the Gemini credentials are missing, the rule-based coach runs, labelled "Rule-based coach (not AI)". OpenAI remains available by setting `AI_PROVIDER=openai` with `OPENAI_API_KEY` and `OPENAI_MODEL`.
 * Leave `DATABASE_URL` blank to use a local file database (fine for development).
 * **Check the database connection**: `cd api && npm run db:check` (connects, creates the tables, reports `5 of 5`). Restart `npm start` after editing `.env`.
 * On Render/Vercel, put the same names in the host's environment-variable settings instead of files. `.env` files are git-ignored; never commit real keys. Never put keys in `web/` files that start with `NEXT_PUBLIC_`.

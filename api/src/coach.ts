@@ -79,7 +79,7 @@ export class OpenAICoach implements CoachProvider {
 
 export class GeminiCoach implements CoachProvider {
   readonly name: string;
-  constructor(private apiKey: string, private model: string, private fetchFn: typeof fetch = fetch, private timeoutMs = 15000) { this.name = `llm:${model}`; }
+  constructor(private apiKey: string, private model: string, private fetchFn: typeof fetch = fetch, private timeoutMs = 60000) { this.name = `llm:${model}`; }
   async generate(facts: CoachFacts): Promise<CoachingContent> {
     const url = new URL(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(this.model)}:generateContent`);
     const res = await this.fetchFn(url, {
