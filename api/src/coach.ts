@@ -82,7 +82,7 @@ export class GeminiCoach implements CoachProvider {
   constructor(private apiKey: string, private model: string, private fetchFn: typeof fetch = fetch, private timeoutMs = 60000) { this.name = `llm:${model}`; }
   async generate(facts: CoachFacts): Promise<CoachingContent> {
     const url = new URL(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(this.model)}:generateContent`);
-    const res = await this.fetchFn(url, {
+    const request = {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-goog-api-key': this.apiKey },
       signal: AbortSignal.timeout(this.timeoutMs),
@@ -93,7 +93,12 @@ export class GeminiCoach implements CoachProvider {
         contents: [{ role: 'user', parts: [{ text: JSON.stringify(facts) }] }],
         generationConfig: { responseMimeType: 'application/json' },
       }),
-    });
+    };
+    let res = await this.fetchFn(url, request);
+    if (res.status === 503) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      res = await this.fetchFn(url, request);
+    }
     if (!res.ok) {
       const errorBody: any = await res.json().catch(() => null);
       const detail = typeof errorBody?.error?.message === 'string' ? `: ${errorBody.error.message.slice(0, 200)}` : '';

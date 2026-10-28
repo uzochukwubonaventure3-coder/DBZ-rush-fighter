@@ -240,6 +240,18 @@ describe('coaching failures never lose the match', () => {
     const good = await run(new GeminiCoach('k', 'm', mkFetch(async () => content(JSON.stringify({ summary: 'ok', strengths: ['a'], weaknesses: ['b'], drills: ['c'] })))));
     expect(good.coaching).toMatchObject({ status: 'ready', source: 'llm:m' });
   });
+  it('GeminiCoach retries one HTTP 503 before accepting a successful response', async () => {
+    let calls = 0;
+    const mkFetch = (async () => {
+      calls++;
+      return calls === 1
+        ? new Response('{}', { status: 503 })
+        : new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text: '{"summary":"ok","strengths":["a"],"weaknesses":["b"],"drills":["c"]}' }] } }] }), { status: 200 });
+    }) as unknown as typeof fetch;
+    const result = await run(new GeminiCoach('k', 'm', mkFetch));
+    expect(result.coaching).toMatchObject({ status: 'ready', source: 'llm:m' });
+    expect(calls).toBe(2);
+  });
   it('retry endpoint re-runs coaching', async () => {
     let calls = 0;
     const flaky: CoachProvider = { name: 'llm:flaky', async generate(f) { if (calls++ === 0) throw new Error('boom'); return { summary: 's', strengths: ['a'], weaknesses: ['b'], drills: ['c'] }; } };
